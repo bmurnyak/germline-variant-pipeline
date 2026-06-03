@@ -9,6 +9,7 @@ samples:
 reference:
   fasta: data/reference/hg38_chr21.fa
   genome: hg38
+  known_sites: data/reference/NA12878_GIAB_chr21_only.vcf.gz
 
 params:
   trimmomatic:

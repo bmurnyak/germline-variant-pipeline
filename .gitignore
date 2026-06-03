@@ -1,0 +1,18 @@
+# Large data files
+data/raw/*.fastq.gz
+data/reference/*.fa
+data/reference/*.fa.*
+data/reference/*.dict
+data/reference/*.vcf.gz
+data/reference/*.tbi
+results/aligned/*.bam
+results/aligned/*.bai
+results/trimmed/
+
+# Snakemake
+.snakemake/
+
+# Logs kept but not large outputs
+results/variants/*.g.vcf.gz
+results/variants/*_snps*.vcf.gz
+results/variants/*_indels*.vcf.gz

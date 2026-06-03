@@ -64,20 +64,20 @@ Aggregates FastQC, Picard, and samtools metrics into a single HTML report.
 
 ## Repository Structure
 germline-variant-pipeline/
-├── workflow/
-│   └── Snakefile              # Main pipeline workflow
-├── config/
-│   └── config.yaml            # Pipeline configuration
-├── data/
-│   ├── raw/                   # Input FASTQ files
-│   └── reference/             # Reference genome and known sites
-├── results/
-│   ├── qc/                    # Per-sample QC files
-│   ├── aligned/               # BAM files
-│   ├── variants/              # VCF files
-│   └── reports/               # MultiQC HTML report
-├── environment.yml            # Conda environment
-└── README.md
+|-- workflow/
+|   |-- Snakefile              # Main pipeline workflow
+|-- config/
+|   |-- config.yaml            # Pipeline configuration
+|-- data/
+|   |-- raw/                   # Input FASTQ files
+|   |-- reference/             # Reference genome and known sites
+|-- results/
+|   |-- qc/                    # Per-sample QC files
+|   |-- aligned/               # BAM files
+|   |-- variants/              # VCF files
+|   |-- reports/               # MultiQC HTML report
+|-- environment.yml            # Conda environment
+|-- README.md
 
 ## Installation and Usage
 

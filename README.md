@@ -14,7 +14,7 @@ FASTQ → FastQC → Trimmomatic → BWA-MEM → MarkDuplicates → BQSR → Hap
 |------|---------|---------|
 | Snakemake | 9.22.0 | Workflow management |
 | BWA | 0.7.19 | Read alignment |
-| GATK4 | 4.6.2.0 | Variant calling, BQSR, QC |
+| GATK4 | 4.6.2.0 | Variant calling, BQSR, QC metrics |
 | Trimmomatic | 0.40 | Adapter trimming |
 | FastQC | 0.12.1 | Read quality control |
 | MultiQC | 1.35 | QC report aggregation |
@@ -65,18 +65,18 @@ Aggregates FastQC, Picard, and samtools metrics into a single HTML report.
 ## Repository Structure
 germline-variant-pipeline/
 ├── workflow/
-│   └── Snakefile          # Main pipeline workflow
+│   └── Snakefile              # Main pipeline workflow
 ├── config/
-│   └── config.yaml        # Pipeline configuration
+│   └── config.yaml            # Pipeline configuration
 ├── data/
-│   ├── raw/               # Input FASTQ files
-│   └── reference/         # Reference genome and known sites
+│   ├── raw/                   # Input FASTQ files
+│   └── reference/             # Reference genome and known sites
 ├── results/
-│   ├── qc/                # Per-sample QC files
-│   ├── aligned/           # BAM files
-│   ├── variants/          # VCF files
-│   └── reports/           # MultiQC HTML report
-├── environment.yml        # Conda environment
+│   ├── qc/                    # Per-sample QC files
+│   ├── aligned/               # BAM files
+│   ├── variants/              # VCF files
+│   └── reports/               # MultiQC HTML report
+├── environment.yml            # Conda environment
 └── README.md
 
 ## Installation and Usage
@@ -109,13 +109,11 @@ Open `results/reports/multiqc_report.html` in a browser for the aggregated QC re
 
 ## Clinical Relevance
 
-This pipeline implements the GATK4 best practices workflow used in clinical genomics laboratories for germline variant calling. Key clinical applications include:
+This pipeline implements the GATK4 best practices workflow used in clinical genomics laboratories for germline variant calling. Key applications include:
 
-- **Hereditary cancer panels** (BRCA1/2, Lynch syndrome genes) — ARUP, Myriad Genetics
-- **Whole exome sequencing** for rare disease diagnosis
-- **Pharmacogenomics** variant calling
-
-The hard filtering approach used here (QD, FS, MQ, ReadPosRankSum thresholds) is equivalent to VQSR for single-sample analysis where cohort size is insufficient for VQSR training.
+- Hereditary cancer panel sequencing (BRCA1/2, Lynch syndrome genes)
+- Whole exome sequencing for rare disease diagnosis
+- Pharmacogenomics variant calling
 
 ## Notes on BQSR
 

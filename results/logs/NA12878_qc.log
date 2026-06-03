@@ -1,0 +1,41 @@
+Using GATK jar /home/bmurnyak/miniconda3/envs/variant-calling/share/gatk4-4.6.2.0-0/gatk-package-4.6.2.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /home/bmurnyak/miniconda3/envs/variant-calling/share/gatk4-4.6.2.0-0/gatk-package-4.6.2.0-local.jar CollectAlignmentSummaryMetrics -I results/aligned/NA12878_recal.bam -R data/reference/hg38_chr21.fa -O results/qc/NA12878_alignment_metrics.txt
+09:39:40.372 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/bmurnyak/miniconda3/envs/variant-calling/share/gatk4-4.6.2.0-0/gatk-package-4.6.2.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Wed Jun 03 09:39:40 MDT 2026] CollectAlignmentSummaryMetrics --INPUT results/aligned/NA12878_recal.bam --OUTPUT results/qc/NA12878_alignment_metrics.txt --REFERENCE_SEQUENCE data/reference/hg38_chr21.fa --MAX_INSERT_SIZE 100000 --EXPECTED_PAIR_ORIENTATIONS FR --ADAPTER_SEQUENCE AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT --ADAPTER_SEQUENCE AGATCGGAAGAGCTCGTATGCCGTCTTCTGCTTG --ADAPTER_SEQUENCE AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT --ADAPTER_SEQUENCE AGATCGGAAGAGCGGTTCAGCAGGAATGCCGAGACCGATCTCGTATGCCGTCTTCTGCTTG --ADAPTER_SEQUENCE AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT --ADAPTER_SEQUENCE AGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG --METRIC_ACCUMULATION_LEVEL ALL_READS --IS_BISULFITE_SEQUENCED false --COLLECT_ALIGNMENT_INFORMATION true --ASSUME_SORTED true --STOP_AFTER 0 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Wed Jun 03 09:39:40 MDT 2026] Executing as bmurnyak@Balazs on Linux 5.15.167.4-microsoft-standard-WSL2 amd64; OpenJDK 64-Bit Server VM 17.0.18-internal+0-adhoc.conda.src; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.6.2.0
+INFO	2026-06-03 09:39:56	SinglePassSamProgram	Processed     1,000,000 records.  Elapsed time: 00:00:14s.  Time for last 1,000,000:   14s.  Last read position: chr21:10,474,823
+INFO	2026-06-03 09:40:04	SinglePassSamProgram	Processed     2,000,000 records.  Elapsed time: 00:00:22s.  Time for last 1,000,000:    7s.  Last read position: chr21:14,586,307
+INFO	2026-06-03 09:40:10	SinglePassSamProgram	Processed     3,000,000 records.  Elapsed time: 00:00:29s.  Time for last 1,000,000:    6s.  Last read position: chr21:18,593,313
+INFO	2026-06-03 09:40:16	SinglePassSamProgram	Processed     4,000,000 records.  Elapsed time: 00:00:34s.  Time for last 1,000,000:    5s.  Last read position: chr21:22,603,480
+INFO	2026-06-03 09:40:22	SinglePassSamProgram	Processed     5,000,000 records.  Elapsed time: 00:00:41s.  Time for last 1,000,000:    6s.  Last read position: chr21:26,604,471
+INFO	2026-06-03 09:40:27	SinglePassSamProgram	Processed     6,000,000 records.  Elapsed time: 00:00:46s.  Time for last 1,000,000:    5s.  Last read position: chr21:30,620,603
+INFO	2026-06-03 09:40:33	SinglePassSamProgram	Processed     7,000,000 records.  Elapsed time: 00:00:52s.  Time for last 1,000,000:    5s.  Last read position: chr21:34,629,797
+INFO	2026-06-03 09:40:39	SinglePassSamProgram	Processed     8,000,000 records.  Elapsed time: 00:00:58s.  Time for last 1,000,000:    6s.  Last read position: chr21:38,637,693
+INFO	2026-06-03 09:40:48	SinglePassSamProgram	Processed     9,000,000 records.  Elapsed time: 00:01:07s.  Time for last 1,000,000:    8s.  Last read position: chr21:42,645,162
+INFO	2026-06-03 09:40:57	SinglePassSamProgram	Processed    10,000,000 records.  Elapsed time: 00:01:16s.  Time for last 1,000,000:    9s.  Last read position: chr21:46,699,822
+[Wed Jun 03 09:40:57 MDT 2026] picard.analysis.CollectAlignmentSummaryMetrics done. Elapsed time: 1.29 minutes.
+Runtime.totalMemory()=360710144
+Using GATK jar /home/bmurnyak/miniconda3/envs/variant-calling/share/gatk4-4.6.2.0-0/gatk-package-4.6.2.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /home/bmurnyak/miniconda3/envs/variant-calling/share/gatk4-4.6.2.0-0/gatk-package-4.6.2.0-local.jar CollectInsertSizeMetrics -I results/aligned/NA12878_recal.bam -O results/qc/NA12878_insert_size_metrics.txt -H results/qc/NA12878_insert_size_metrics.txt_histogram.pdf
+INFO	2026-06-03 09:41:01	RExecutor	Executing R script via command: Rscript /tmp/bmurnyak/script1462353103463197164.R
+INFO	2026-06-03 09:41:01	ProcessExecutor	[1] "Checking if R is installed"
+09:41:02.014 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/bmurnyak/miniconda3/envs/variant-calling/share/gatk4-4.6.2.0-0/gatk-package-4.6.2.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+[Wed Jun 03 09:41:02 MDT 2026] CollectInsertSizeMetrics --Histogram_FILE results/qc/NA12878_insert_size_metrics.txt_histogram.pdf --INPUT results/aligned/NA12878_recal.bam --OUTPUT results/qc/NA12878_insert_size_metrics.txt --DEVIATIONS 10.0 --MINIMUM_PCT 0.05 --METRIC_ACCUMULATION_LEVEL ALL_READS --INCLUDE_DUPLICATES false --ASSUME_SORTED true --STOP_AFTER 0 --VERBOSITY INFO --QUIET false --VALIDATION_STRINGENCY STRICT --COMPRESSION_LEVEL 2 --MAX_RECORDS_IN_RAM 500000 --CREATE_INDEX false --CREATE_MD5_FILE false --help false --version false --showHidden false --USE_JDK_DEFLATER false --USE_JDK_INFLATER false
+[Wed Jun 03 09:41:02 MDT 2026] Executing as bmurnyak@Balazs on Linux 5.15.167.4-microsoft-standard-WSL2 amd64; OpenJDK 64-Bit Server VM 17.0.18-internal+0-adhoc.conda.src; Deflater: Intel; Inflater: Intel; Provider GCS is available; Picard version: Version:4.6.2.0
+INFO	2026-06-03 09:41:06	SinglePassSamProgram	Processed     1,000,000 records.  Elapsed time: 00:00:04s.  Time for last 1,000,000:    4s.  Last read position: chr21:10,474,823
+INFO	2026-06-03 09:41:09	SinglePassSamProgram	Processed     2,000,000 records.  Elapsed time: 00:00:07s.  Time for last 1,000,000:    2s.  Last read position: chr21:14,586,307
+INFO	2026-06-03 09:41:12	SinglePassSamProgram	Processed     3,000,000 records.  Elapsed time: 00:00:09s.  Time for last 1,000,000:    2s.  Last read position: chr21:18,593,313
+INFO	2026-06-03 09:41:15	SinglePassSamProgram	Processed     4,000,000 records.  Elapsed time: 00:00:13s.  Time for last 1,000,000:    3s.  Last read position: chr21:22,603,480
+INFO	2026-06-03 09:41:17	SinglePassSamProgram	Processed     5,000,000 records.  Elapsed time: 00:00:15s.  Time for last 1,000,000:    1s.  Last read position: chr21:26,604,471
+INFO	2026-06-03 09:41:18	SinglePassSamProgram	Processed     6,000,000 records.  Elapsed time: 00:00:16s.  Time for last 1,000,000:    1s.  Last read position: chr21:30,620,603
+INFO	2026-06-03 09:41:20	SinglePassSamProgram	Processed     7,000,000 records.  Elapsed time: 00:00:17s.  Time for last 1,000,000:    1s.  Last read position: chr21:34,629,797
+INFO	2026-06-03 09:41:21	SinglePassSamProgram	Processed     8,000,000 records.  Elapsed time: 00:00:19s.  Time for last 1,000,000:    1s.  Last read position: chr21:38,637,693
+INFO	2026-06-03 09:41:22	SinglePassSamProgram	Processed     9,000,000 records.  Elapsed time: 00:00:20s.  Time for last 1,000,000:    1s.  Last read position: chr21:42,645,162
+INFO	2026-06-03 09:41:24	SinglePassSamProgram	Processed    10,000,000 records.  Elapsed time: 00:00:21s.  Time for last 1,000,000:    1s.  Last read position: chr21:46,699,822
+INFO	2026-06-03 09:41:24	RExecutor	Executing R script via command: Rscript /tmp/bmurnyak/script9973766870501927395.R /home/bmurnyak/germline-variant-pipeline/results/qc/NA12878_insert_size_metrics.txt /home/bmurnyak/germline-variant-pipeline/results/qc/NA12878_insert_size_metrics.txt_histogram.pdf NA12878_recal.bam
+INFO	2026-06-03 09:41:24	ProcessExecutor	null device 
+INFO	2026-06-03 09:41:24	ProcessExecutor	          1 
+[Wed Jun 03 09:41:24 MDT 2026] picard.analysis.CollectInsertSizeMetrics done. Elapsed time: 0.37 minutes.
+Runtime.totalMemory()=394264576

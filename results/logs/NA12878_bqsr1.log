@@ -1,0 +1,65 @@
+Using GATK jar /home/bmurnyak/miniconda3/envs/variant-calling/share/gatk4-4.6.2.0-0/gatk-package-4.6.2.0-local.jar
+Running:
+    java -Dsamjdk.use_async_io_read_samtools=false -Dsamjdk.use_async_io_write_samtools=true -Dsamjdk.use_async_io_write_tribble=false -Dsamjdk.compression_level=2 -jar /home/bmurnyak/miniconda3/envs/variant-calling/share/gatk4-4.6.2.0-0/gatk-package-4.6.2.0-local.jar BaseRecalibrator -I results/aligned/NA12878_markdup.bam -R data/reference/hg38_chr21.fa --known-sites data/reference/NA12878_GIAB_chr21_only.vcf.gz -O results/aligned/NA12878_recal.table
+08:53:51.768 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/bmurnyak/miniconda3/envs/variant-calling/share/gatk4-4.6.2.0-0/gatk-package-4.6.2.0-local.jar!/com/intel/gkl/native/libgkl_compression.so
+08:53:52.032 INFO  BaseRecalibrator - ------------------------------------------------------------
+08:53:52.038 INFO  BaseRecalibrator - The Genome Analysis Toolkit (GATK) v4.6.2.0
+08:53:52.038 INFO  BaseRecalibrator - For support and documentation go to https://software.broadinstitute.org/gatk/
+08:53:52.038 INFO  BaseRecalibrator - Executing as bmurnyak@Balazs on Linux v5.15.167.4-microsoft-standard-WSL2 amd64
+08:53:52.038 INFO  BaseRecalibrator - Java runtime: OpenJDK 64-Bit Server VM v17.0.18-internal+0-adhoc.conda.src
+08:53:52.039 INFO  BaseRecalibrator - Start Date/Time: June 3, 2026 at 8:53:51 AM MDT
+08:53:52.039 INFO  BaseRecalibrator - ------------------------------------------------------------
+08:53:52.039 INFO  BaseRecalibrator - ------------------------------------------------------------
+08:53:52.042 INFO  BaseRecalibrator - HTSJDK Version: 4.2.0
+08:53:52.042 INFO  BaseRecalibrator - Picard Version: 3.4.0
+08:53:52.042 INFO  BaseRecalibrator - Built for Spark Version: 3.5.0
+08:53:52.047 INFO  BaseRecalibrator - HTSJDK Defaults.COMPRESSION_LEVEL : 2
+08:53:52.048 INFO  BaseRecalibrator - HTSJDK Defaults.USE_ASYNC_IO_READ_FOR_SAMTOOLS : false
+08:53:52.048 INFO  BaseRecalibrator - HTSJDK Defaults.USE_ASYNC_IO_WRITE_FOR_SAMTOOLS : true
+08:53:52.049 INFO  BaseRecalibrator - HTSJDK Defaults.USE_ASYNC_IO_WRITE_FOR_TRIBBLE : false
+08:53:52.049 INFO  BaseRecalibrator - Deflater: IntelDeflater
+08:53:52.049 INFO  BaseRecalibrator - Inflater: IntelInflater
+08:53:52.050 INFO  BaseRecalibrator - GCS max retries/reopens: 20
+08:53:52.050 INFO  BaseRecalibrator - Requester pays: disabled
+08:53:52.051 INFO  BaseRecalibrator - Initializing engine
+08:53:52.279 INFO  FeatureManager - Using codec VCFCodec to read file file:///home/bmurnyak/germline-variant-pipeline/data/reference/NA12878_GIAB_chr21_only.vcf.gz
+08:53:52.355 INFO  BaseRecalibrator - Done initializing engine
+08:53:52.364 INFO  BaseRecalibrationEngine - The covariates being used here: 
+08:53:52.364 INFO  BaseRecalibrationEngine - 	ReadGroupCovariate
+08:53:52.364 INFO  BaseRecalibrationEngine - 	QualityScoreCovariate
+08:53:52.364 INFO  BaseRecalibrationEngine - 	ContextCovariate
+08:53:52.365 INFO  BaseRecalibrationEngine - 	CycleCovariate
+08:53:52.368 INFO  ProgressMeter - Starting traversal
+08:53:52.370 INFO  ProgressMeter -        Current Locus  Elapsed Minutes       Reads Processed     Reads/Minute
+08:54:02.385 INFO  ProgressMeter -        chr21:9869388              0.2                394000        2361874.3
+08:54:12.381 INFO  ProgressMeter -       chr21:12578917              0.3               1004000        3010344.3
+08:54:22.387 INFO  ProgressMeter -       chr21:15308991              0.5               1639000        3276143.5
+08:54:32.404 INFO  ProgressMeter -       chr21:17793436              0.7               2259000        3385706.8
+08:54:42.417 INFO  ProgressMeter -       chr21:20251258              0.8               2871000        3441964.6
+08:54:52.427 INFO  ProgressMeter -       chr21:22798612              1.0               3506000        3502672.5
+08:55:02.437 INFO  ProgressMeter -       chr21:25279805              1.2               4125000        3532383.8
+08:55:12.446 INFO  ProgressMeter -       chr21:27758389              1.3               4745000        3555372.4
+08:55:22.456 INFO  ProgressMeter -       chr21:30185691              1.5               5348000        3561969.3
+08:55:32.468 INFO  ProgressMeter -       chr21:32478481              1.7               5920000        3548557.9
+08:55:42.487 INFO  ProgressMeter -       chr21:35084190              1.8               6541000        3564059.7
+08:55:52.487 INFO  ProgressMeter -       chr21:37161483              2.0               7058000        3525562.6
+08:56:02.490 INFO  ProgressMeter -       chr21:39644794              2.2               7678000        3540424.2
+08:56:12.491 INFO  ProgressMeter -       chr21:42177112              2.3               8310000        3558353.1
+08:56:22.500 INFO  ProgressMeter -       chr21:45230718              2.5               8965000        3582894.8
+08:56:28.426 INFO  BaseRecalibrator - 666539 read(s) filtered by: MappingQualityNotZeroReadFilter 
+0 read(s) filtered by: MappingQualityAvailableReadFilter 
+0 read(s) filtered by: MappedReadFilter 
+0 read(s) filtered by: NotSecondaryAlignmentReadFilter 
+3260 read(s) filtered by: NotDuplicateReadFilter 
+0 read(s) filtered by: PassesVendorQualityCheckReadFilter 
+0 read(s) filtered by: WellformedReadFilter 
+669799 total reads filtered out of 10000000 reads processed
+08:56:28.427 INFO  ProgressMeter -       chr21:46698761              2.6               9330201        3587228.1
+08:56:28.427 INFO  ProgressMeter - Traversal complete. Processed 9330201 total reads in 2.6 minutes.
+08:56:28.428 INFO  BaseRecalibrator - Calculating quantized quality scores...
+08:56:28.460 INFO  BaseRecalibrator - Writing recalibration report...
+08:56:28.955 INFO  BaseRecalibrator - ...done!
+08:56:28.961 INFO  BaseRecalibrator - BaseRecalibrator was able to recalibrate 9330201 reads
+08:56:28.962 INFO  BaseRecalibrator - Shutting down engine
+[June 3, 2026 at 8:56:28 AM MDT] org.broadinstitute.hellbender.tools.walkers.bqsr.BaseRecalibrator done. Elapsed time: 2.62 minutes.
+Runtime.totalMemory()=337641472

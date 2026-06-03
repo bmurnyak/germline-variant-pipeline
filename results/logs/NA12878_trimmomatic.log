@@ -1,0 +1,4 @@
+TrimmomaticPE: Started with arguments:
+ -phred33 -threads 4 data/raw/NA12878_chr21_R1.fastq.gz data/raw/NA12878_chr21_R2.fastq.gz results/trimmed/NA12878_R1_paired.fastq.gz results/trimmed/NA12878_R1_unpaired.fastq.gz results/trimmed/NA12878_R2_paired.fastq.gz results/trimmed/NA12878_R2_unpaired.fastq.gz LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+Input Read Pairs: 5000000 Both Surviving: 5000000 (100.00%) Forward Only Surviving: 0 (0.00%) Reverse Only Surviving: 0 (0.00%) Dropped: 0 (0.00%)
+TrimmomaticPE: Completed successfully

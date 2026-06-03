@@ -1,0 +1,11 @@
+
+/// MultiQC 🔍 v1.35
+
+       file_search | Search path: /home/bmurnyak/germline-variant-pipeline/results/qc
+            picard | Found 1 AlignmentSummaryMetrics reports
+            picard | Found 1 InsertSizeMetrics reports
+            picard | Found 1 MarkDuplicates reports
+          samtools | Found 1 flagstat reports
+     write_results | Data        : results/reports/multiqc_report_data   (overwritten)
+     write_results | Report      : results/reports/multiqc_report.html
+           multiqc | MultiQC complete

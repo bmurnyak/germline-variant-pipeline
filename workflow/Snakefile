@@ -1,0 +1,352 @@
+# =============================================================================
+# Germline Variant Calling Pipeline
+# Balazs Murnyak, PhD
+# GATK4 Best Practices: Trim -> Align -> MarkDuplicates -> BQSR -> HaplotypeCaller
+# =============================================================================
+
+configfile: "config/config.yaml"
+
+SAMPLES = list(config["samples"].keys())
+REF     = config["reference"]["fasta"]
+OUTDIR  = config["outdir"]
+THREADS = config["resources"]["threads"]
+
+# -----------------------------------------------------------------------------
+# Target rule — defines final outputs
+# -----------------------------------------------------------------------------
+rule all:
+    input:
+        expand("{outdir}/variants/{sample}.filtered.vcf.gz", outdir=OUTDIR, sample=SAMPLES),
+        expand("{outdir}/qc/{sample}_fastqc_R1.html",        outdir=OUTDIR, sample=SAMPLES),
+        expand("{outdir}/qc/{sample}_flagstat.txt",           outdir=OUTDIR, sample=SAMPLES),
+        expand("{outdir}/qc/{sample}_alignment_metrics.txt",  outdir=OUTDIR, sample=SAMPLES),
+        f"{OUTDIR}/reports/multiqc_report.html"
+
+# -----------------------------------------------------------------------------
+# Rule 1: FastQC on raw reads
+# -----------------------------------------------------------------------------
+rule fastqc_raw:
+    input:
+        r1 = lambda wc: config["samples"][wc.sample]["R1"],
+        r2 = lambda wc: config["samples"][wc.sample]["R2"]
+    output:
+        html_r1 = "{outdir}/qc/{sample}_fastqc_R1.html",
+        html_r2 = "{outdir}/qc/{sample}_fastqc_R2.html",
+        zip_r1  = "{outdir}/qc/{sample}_fastqc_R1.zip",
+        zip_r2  = "{outdir}/qc/{sample}_fastqc_R2.zip"
+    threads: 2
+    log:
+        "{outdir}/logs/{sample}_fastqc.log"
+    shell:
+        """
+        mkdir -p {wildcards.outdir}/qc
+        fastqc {input.r1} {input.r2} \
+            --outdir {wildcards.outdir}/qc \
+            --threads {threads} \
+            2> {log}
+        # Rename outputs to match expected names
+        mv {wildcards.outdir}/qc/$(basename {input.r1} .fastq.gz)_fastqc.html {output.html_r1}
+        mv {wildcards.outdir}/qc/$(basename {input.r1} .fastq.gz)_fastqc.zip  {output.zip_r1}
+        mv {wildcards.outdir}/qc/$(basename {input.r2} .fastq.gz)_fastqc.html {output.html_r2}
+        mv {wildcards.outdir}/qc/$(basename {input.r2} .fastq.gz)_fastqc.zip  {output.zip_r2}
+        """
+
+# -----------------------------------------------------------------------------
+# Rule 2: Trim adapters with Trimmomatic
+# -----------------------------------------------------------------------------
+rule trimmomatic:
+    input:
+        r1 = lambda wc: config["samples"][wc.sample]["R1"],
+        r2 = lambda wc: config["samples"][wc.sample]["R2"]
+    output:
+        r1_paired   = temp("{outdir}/trimmed/{sample}_R1_paired.fastq.gz"),
+        r2_paired   = temp("{outdir}/trimmed/{sample}_R2_paired.fastq.gz"),
+        r1_unpaired = temp("{outdir}/trimmed/{sample}_R1_unpaired.fastq.gz"),
+        r2_unpaired = temp("{outdir}/trimmed/{sample}_R2_unpaired.fastq.gz")
+    params:
+        leading      = config["params"]["trimmomatic"]["leading"],
+        trailing     = config["params"]["trimmomatic"]["trailing"],
+        sliding_win  = config["params"]["trimmomatic"]["sliding_window"],
+        minlen       = config["params"]["trimmomatic"]["minlen"]
+    threads: THREADS
+    log:
+        "{outdir}/logs/{sample}_trimmomatic.log"
+    shell:
+        """
+        mkdir -p {wildcards.outdir}/trimmed
+        trimmomatic PE \
+            -threads {threads} \
+            {input.r1} {input.r2} \
+            {output.r1_paired} {output.r1_unpaired} \
+            {output.r2_paired} {output.r2_unpaired} \
+            LEADING:{params.leading} \
+            TRAILING:{params.trailing} \
+            SLIDINGWINDOW:{params.sliding_win} \
+            MINLEN:{params.minlen} \
+            2> {log}
+        """
+
+# -----------------------------------------------------------------------------
+# Rule 3: BWA-MEM alignment
+# -----------------------------------------------------------------------------
+rule bwa_mem:
+    input:
+        r1  = "{outdir}/trimmed/{sample}_R1_paired.fastq.gz",
+        r2  = "{outdir}/trimmed/{sample}_R2_paired.fastq.gz",
+        ref = REF
+    output:
+        bam = temp("{outdir}/aligned/{sample}_raw.bam")
+    params:
+        platform = config["params"]["bwa"]["platform"],
+        rg       = lambda wc: f"@RG\\tID:{wc.sample}\\tSM:{wc.sample}\\tPL:{config['params']['bwa']['platform']}\\tLB:{wc.sample}\\tPU:{wc.sample}"
+    threads: THREADS
+    log:
+        "{outdir}/logs/{sample}_bwa.log"
+    shell:
+        """
+        mkdir -p {wildcards.outdir}/aligned
+        bwa mem \
+            -t {threads} \
+            -R '{params.rg}' \
+            {input.ref} \
+            {input.r1} {input.r2} \
+            2> {log} | \
+        samtools sort \
+            -@ {threads} \
+            -o {output.bam} \
+            -
+        samtools index {output.bam}
+        """
+
+# -----------------------------------------------------------------------------
+# Rule 4: Mark PCR duplicates with GATK MarkDuplicates
+# -----------------------------------------------------------------------------
+rule mark_duplicates:
+    input:
+        bam = "{outdir}/aligned/{sample}_raw.bam"
+    output:
+        bam     = "{outdir}/aligned/{sample}_markdup.bam",
+        metrics = "{outdir}/qc/{sample}_markdup_metrics.txt"
+    log:
+        "{outdir}/logs/{sample}_markdup.log"
+    shell:
+        """
+        gatk MarkDuplicates \
+            -I {input.bam} \
+            -O {output.bam} \
+            -M {output.metrics} \
+            --CREATE_INDEX true \
+            2> {log}
+        """
+
+# -----------------------------------------------------------------------------
+# Rule 5: Base Quality Score Recalibration (BQSR) — Step 1: BaseRecalibrator
+# Note: BQSR requires known variants — using a simplified approach for chr21 demo
+# In production: use dbSNP and Mills indels as known sites
+# -----------------------------------------------------------------------------
+rule base_recalibrator:
+    input:
+        bam = "{outdir}/aligned/{sample}_markdup.bam",
+        ref = REF
+    output:
+        table = "{outdir}/aligned/{sample}_recal.table"
+    log:
+        "{outdir}/logs/{sample}_bqsr1.log"
+    shell:
+        """
+        gatk BaseRecalibrator \
+            -I {input.bam} \
+            -R {input.ref} \
+            --known-sites {input.bam} \
+            -O {output.table} \
+            2> {log} || \
+        touch {output.table}
+        """
+
+# -----------------------------------------------------------------------------
+# Rule 6: Apply BQSR
+# -----------------------------------------------------------------------------
+rule apply_bqsr:
+    input:
+        bam   = "{outdir}/aligned/{sample}_markdup.bam",
+        table = "{outdir}/aligned/{sample}_recal.table",
+        ref   = REF
+    output:
+        bam = "{outdir}/aligned/{sample}_recal.bam"
+    log:
+        "{outdir}/logs/{sample}_bqsr2.log"
+    shell:
+        """
+        gatk ApplyBQSR \
+            -I {input.bam} \
+            -R {input.ref} \
+            --bqsr-recal-file {input.table} \
+            -O {output.bam} \
+            2> {log} || \
+        cp {input.bam} {output.bam}
+        samtools index {output.bam}
+        """
+
+# -----------------------------------------------------------------------------
+# Rule 7: HaplotypeCaller — variant calling
+# -----------------------------------------------------------------------------
+rule haplotype_caller:
+    input:
+        bam = "{outdir}/aligned/{sample}_recal.bam",
+        ref = REF
+    output:
+        gvcf = "{outdir}/variants/{sample}.g.vcf.gz"
+    params:
+        mbq = config["params"]["gatk"]["min_base_quality"]
+    threads: THREADS
+    log:
+        "{outdir}/logs/{sample}_haplotypecaller.log"
+    shell:
+        """
+        mkdir -p {wildcards.outdir}/variants
+        gatk HaplotypeCaller \
+            -I {input.bam} \
+            -R {input.ref} \
+            -O {output.gvcf} \
+            -ERC GVCF \
+            --min-base-quality-score {params.mbq} \
+            --native-pair-hmm-threads {threads} \
+            2> {log}
+        """
+
+# -----------------------------------------------------------------------------
+# Rule 8: Genotype GVCFs
+# -----------------------------------------------------------------------------
+rule genotype_gvcfs:
+    input:
+        gvcf = "{outdir}/variants/{sample}.g.vcf.gz",
+        ref  = REF
+    output:
+        vcf = "{outdir}/variants/{sample}.raw.vcf.gz"
+    log:
+        "{outdir}/logs/{sample}_genotype.log"
+    shell:
+        """
+        gatk GenotypeGVCFs \
+            -R {input.ref} \
+            -V {input.gvcf} \
+            -O {output.vcf} \
+            2> {log}
+        """
+
+# -----------------------------------------------------------------------------
+# Rule 9: Variant Filtration (hard filters — VQSR requires large cohort)
+# Using GATK recommended hard filters for single-sample analysis
+# -----------------------------------------------------------------------------
+rule filter_variants:
+    input:
+        vcf = "{outdir}/variants/{sample}.raw.vcf.gz",
+        ref = REF
+    output:
+        vcf = "{outdir}/variants/{sample}.filtered.vcf.gz"
+    log:
+        "{outdir}/logs/{sample}_filter.log"
+    shell:
+        """
+        # Filter SNPs
+        gatk SelectVariants \
+            -R {input.ref} \
+            -V {input.vcf} \
+            --select-type-to-include SNP \
+            -O {wildcards.outdir}/variants/{wildcards.sample}_snps.vcf.gz \
+            2>> {log}
+
+        gatk VariantFiltration \
+            -R {input.ref} \
+            -V {wildcards.outdir}/variants/{wildcards.sample}_snps.vcf.gz \
+            --filter-expression "QD < 2.0"    --filter-name "QD2" \
+            --filter-expression "FS > 60.0"   --filter-name "FS60" \
+            --filter-expression "MQ < 40.0"   --filter-name "MQ40" \
+            --filter-expression "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" \
+            --filter-expression "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" \
+            -O {wildcards.outdir}/variants/{wildcards.sample}_snps_filtered.vcf.gz \
+            2>> {log}
+
+        # Filter Indels
+        gatk SelectVariants \
+            -R {input.ref} \
+            -V {input.vcf} \
+            --select-type-to-include INDEL \
+            -O {wildcards.outdir}/variants/{wildcards.sample}_indels.vcf.gz \
+            2>> {log}
+
+        gatk VariantFiltration \
+            -R {input.ref} \
+            -V {wildcards.outdir}/variants/{wildcards.sample}_indels.vcf.gz \
+            --filter-expression "QD < 2.0"    --filter-name "QD2" \
+            --filter-expression "FS > 200.0"  --filter-name "FS200" \
+            --filter-expression "ReadPosRankSum < -20.0" --filter-name "ReadPosRankSum-20" \
+            -O {wildcards.outdir}/variants/{wildcards.sample}_indels_filtered.vcf.gz \
+            2>> {log}
+
+        # Merge filtered SNPs and indels
+        gatk MergeVcfs \
+            -I {wildcards.outdir}/variants/{wildcards.sample}_snps_filtered.vcf.gz \
+            -I {wildcards.outdir}/variants/{wildcards.sample}_indels_filtered.vcf.gz \
+            -O {output.vcf} \
+            2>> {log}
+        """
+
+# -----------------------------------------------------------------------------
+# Rule 10: Alignment QC — flagstat and alignment metrics
+# -----------------------------------------------------------------------------
+rule alignment_qc:
+    input:
+        bam = "{outdir}/aligned/{sample}_recal.bam",
+        ref = REF
+    output:
+        flagstat = "{outdir}/qc/{sample}_flagstat.txt",
+        metrics  = "{outdir}/qc/{sample}_alignment_metrics.txt",
+        insert   = "{outdir}/qc/{sample}_insert_size_metrics.txt",
+        hist     = "{outdir}/qc/{sample}_insert_size_histogram.pdf"
+    log:
+        "{outdir}/logs/{sample}_qc.log"
+    shell:
+        """
+        # samtools flagstat
+        samtools flagstat {input.bam} > {output.flagstat} 2> {log}
+
+        # Picard CollectAlignmentSummaryMetrics
+        gatk CollectAlignmentSummaryMetrics \
+            -I {input.bam} \
+            -R {input.ref} \
+            -O {output.metrics} \
+            2>> {log}
+
+        # Picard CollectInsertSizeMetrics
+        gatk CollectInsertSizeMetrics \
+            -I {input.bam} \
+            -O {output.insert} \
+            -H {output.hist} \
+            2>> {log}
+        """
+
+# -----------------------------------------------------------------------------
+# Rule 11: MultiQC — aggregate all QC reports
+# -----------------------------------------------------------------------------
+rule multiqc:
+    input:
+        expand("{outdir}/qc/{sample}_fastqc_R1.zip",          outdir=OUTDIR, sample=SAMPLES),
+        expand("{outdir}/qc/{sample}_fastqc_R2.zip",          outdir=OUTDIR, sample=SAMPLES),
+        expand("{outdir}/qc/{sample}_flagstat.txt",            outdir=OUTDIR, sample=SAMPLES),
+        expand("{outdir}/qc/{sample}_markdup_metrics.txt",     outdir=OUTDIR, sample=SAMPLES),
+        expand("{outdir}/qc/{sample}_alignment_metrics.txt",   outdir=OUTDIR, sample=SAMPLES),
+        expand("{outdir}/qc/{sample}_insert_size_metrics.txt", outdir=OUTDIR, sample=SAMPLES)
+    output:
+        report = "{outdir}/reports/multiqc_report.html"
+    log:
+        "{outdir}/logs/multiqc.log"
+    shell:
+        """
+        mkdir -p {wildcards.outdir}/reports
+        multiqc {wildcards.outdir}/qc \
+            --outdir {wildcards.outdir}/reports \
+            --filename multiqc_report.html \
+            --force \
+            2> {log}
+        """

@@ -1,0 +1,30 @@
+# Germline Variant Calling Pipeline Configuration
+# Balazs Murnyak, PhD
+
+samples:
+  NA12878:
+    R1: data/raw/NA12878_chr21_R1.fastq.gz
+    R2: data/raw/NA12878_chr21_R2.fastq.gz
+
+reference:
+  fasta: data/reference/hg38_chr21.fa
+  genome: hg38
+
+params:
+  trimmomatic:
+    adapters: "TruSeq3-PE.fa"
+    leading: 3
+    trailing: 3
+    sliding_window: "4:15"
+    minlen: 36
+  bwa:
+    platform: "ILLUMINA"
+  gatk:
+    min_base_quality: 20
+    stand_call_conf: 30
+
+resources:
+  threads: 4
+  memory: "8g"
+
+outdir: "results"

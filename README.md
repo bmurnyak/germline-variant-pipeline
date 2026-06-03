@@ -63,6 +63,8 @@ Applies GATK recommended hard filters for single-sample analysis:
 Aggregates FastQC, Picard, and samtools metrics into a single HTML report.
 
 ## Repository Structure
+
+```
 germline-variant-pipeline/
 |-- workflow/
 |   |-- Snakefile              # Main pipeline workflow
@@ -78,6 +80,7 @@ germline-variant-pipeline/
 |   |-- reports/               # MultiQC HTML report
 |-- environment.yml            # Conda environment
 |-- README.md
+```
 
 ## Installation and Usage
 
